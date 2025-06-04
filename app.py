@@ -1,26 +1,17 @@
-import streamlit as st
-import openai
+from openai import OpenAI
+import os
 
-# Chiavi prese in automatico dai secrets di Streamlit
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-openai.organization = st.secrets["OPENAI_ORG_ID"]
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-st.title("AI Confidente 🤖")
-st.write("Benvenuto! Qui parlerai con un assistente AI motivazionale.")
+response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "Sei un motivatore positivo ed empatico"},
+        {"role": "user", "content": prompt}
+    ]
+)
 
-prompt = st.text_input("Scrivi qualcosa:")
+st.write("🤖 **Risposta:**", response.choices[0].message.content)
 
-if prompt:
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Sei un motivatore positivo ed empatico."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        st.write("💬 **Risposta:**", response.choices[0].message["content"])
-    except Exception as e:
-        st.error(f"Errore: {e}")
 
 
